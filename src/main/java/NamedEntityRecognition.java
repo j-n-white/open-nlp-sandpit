@@ -70,19 +70,4 @@ public class NamedEntityRecognition {
             e.printStackTrace();
         }
     }
-
-    private static class TokenAndProbability {
-        private final String token;
-        private final double tokenProb;
-
-        public TokenAndProbability(String token, double tokenProb) {
-            this.token = token;
-            this.tokenProb = tokenProb;
-        }
-
-        @Override
-        public String toString() {
-            return token + " - " + tokenProb;
-        }
-    }
 }
