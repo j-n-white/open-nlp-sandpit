@@ -7,8 +7,12 @@ import opennlp.tools.tokenize.TokenizerModel;
 import opennlp.tools.util.Span;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -47,20 +51,27 @@ public class NamedEntityRecognition {
                         try (InputStream tokenModel = NamedEntityRecognition.class.getClassLoader().getResourceAsStream("models/en-token.bin")) {
                             TokenizerModel tokenizerModel = new TokenizerModel(tokenModel);
                             TokenizerME tokenizer = new TokenizerME(tokenizerModel);
-                            try (InputStream nameModel = NamedEntityRecognition.class.getClassLoader().getResourceAsStream("models/en-ner-tech.bin")) {
+                            try (InputStream nameModel = NamedEntityRecognition.class.getClassLoader().getResourceAsStream("models/en-ner-TECH.bin")) {
                                 TokenNameFinderModel nameFinderModel = new TokenNameFinderModel(nameModel);
-                                sentences.stream()
-                                        .map(tokenizer::tokenize)
-                                        .forEach(tokens -> {
-                                            NameFinderME nameFinder = new NameFinderME(nameFinderModel);
-                                            Span[] names = nameFinder.find(tokens);
-                                            Arrays.stream(names).forEach(nameSpan -> {
-                                                tokens[nameSpan.getStart()] = "[" + nameSpan.getType() + ": " + tokens[nameSpan.getStart()];
-                                                tokens[nameSpan.getEnd() - 1 ] = tokens[nameSpan.getEnd() - 1] + "]";
-                                            });
-                                            nameFinder.clearAdaptiveData();
-                                            System.out.println(String.join(" ", tokens));
-                                        });
+                                try (FileWriter writer = new FileWriter("out/annotatedFile-" + LocalDateTime.now().format(DateTimeFormatter.ofPattern("YYYY-MM-dd_HHmmss")) + ".txt", true);
+                                     BufferedWriter bufferedWriter = new BufferedWriter(writer)) {
+                                    List<String> annotatedLines = sentences.stream()
+                                            .map(tokenizer::tokenize)
+                                            .map(tokens -> {
+                                                NameFinderME nameFinder = new NameFinderME(nameFinderModel);
+                                                Span[] names = nameFinder.find(tokens);
+                                                Arrays.stream(names).forEach(nameSpan -> {
+                                                    tokens[nameSpan.getStart()] = "[" + nameSpan.getType() + ": " + tokens[nameSpan.getStart()];
+                                                    tokens[nameSpan.getEnd() - 1] = tokens[nameSpan.getEnd() - 1] + "]";
+                                                });
+                                                nameFinder.clearAdaptiveData();
+                                                return String.join(" ", tokens);
+                                            }).collect(Collectors.toList());
+                                    for (String line : annotatedLines) {
+                                        bufferedWriter.write(line);
+                                        bufferedWriter.newLine();
+                                    }
+                                }
                             }
                         }
                     }

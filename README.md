@@ -5,7 +5,7 @@
 
 ## TrainingModelCreator
 * Add training data to file `src/main/resources/trainingData/trainingData.txt`
-  * This should be in the format of 1 sentence per line with tags round the works of interest `<START:tagName>tokens to be tagged <END>`
+  * This should be in the format of 1 sentence per line with tags round the works of interest `<START:tagName> tokens to be tagged <END>`
 * Run the main method in `TrainingModelCreator.java`
 * This out puts a binary training model file to the `out` directory
 

@@ -15,13 +15,13 @@ import java.nio.charset.StandardCharsets;
 
 public class TrainingModelCreator {
 
-    private static final String TAG_NAME = "tech";
+    private static final String TAG_NAME = "TECH";
     private static final String LANGUAGE_CODE = "en";
 
     public static void main(String[] args) {
 
         try (ObjectStream<String> lineStream =
-                     new PlainTextByLineStream(() -> TrainingModelCreator.class.getClassLoader().getResourceAsStream("trainingData/trainingData.txt"), StandardCharsets.UTF_8);
+                     new PlainTextByLineStream(() -> TrainingModelCreator.class.getClassLoader().getResourceAsStream("trainingData/trainingData25.txt"), StandardCharsets.UTF_8);
              ObjectStream<NameSample> sampleStream = new NameSampleDataStream(lineStream)) {
             TokenNameFinderModel model = NameFinderME.train(LANGUAGE_CODE, TAG_NAME, sampleStream, TrainingParameters.defaultParams(), new TokenNameFinderFactory());
 
